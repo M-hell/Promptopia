@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+
 import PromptCard from "./PromptCard";
 
 const PromptCardList = ({ data, handleTagClick }) => {
@@ -25,25 +26,19 @@ const Feed = () => {
   const [searchTimeout, setSearchTimeout] = useState(null);
   const [searchedResults, setSearchedResults] = useState([]);
 
-  // Fetch posts from the server
   const fetchPosts = async () => {
     const response = await fetch("/api/prompt");
-    if (response.ok) {
-      const data = await response.json();
-      console.log(data);
-      setAllPosts(data);
-    } else {
-      console.error("Failed to fetch posts");
-    }
+    const data = await response.json();
+    console.log(data);
+    setAllPosts(data);
   };
 
   useEffect(() => {
     fetchPosts();
   }, []);
 
-  // Filter prompts based on search text
-  const filterPrompts = (searchText) => {
-    const regex = new RegExp(searchText, "i"); // 'i' flag for case-insensitive search
+  const filterPrompts = (searchtext) => {
+    const regex = new RegExp(searchtext, "i"); // 'i' flag for case-insensitive search
     return allPosts.filter(
       (item) =>
         regex.test(item.creator.username) ||
@@ -56,7 +51,7 @@ const Feed = () => {
     clearTimeout(searchTimeout);
     setSearchText(e.target.value);
 
-    // Debounce method
+    // debounce method
     setSearchTimeout(
       setTimeout(() => {
         const searchResult = filterPrompts(e.target.value);
@@ -70,24 +65,6 @@ const Feed = () => {
 
     const searchResult = filterPrompts(tagName);
     setSearchedResults(searchResult);
-  };
-
-  // Function to add a new prompt
-  const handleAddPrompt = async (newPrompt) => {
-    const response = await fetch("/api/prompt/new", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newPrompt),
-    });
-
-    if (response.ok) {
-      // Refetch posts to get the new prompt
-      fetchPosts();
-    } else {
-      console.error("Failed to add new prompt");
-    }
   };
 
   return (
